@@ -1,17 +1,22 @@
 const searchGithub = async () => {
   try {
+    // Debug token
+    const token = import.meta.env.VITE_GITHUB_TOKEN;
+    console.log('Token starts with:', token?.substring(0, 4));
+    console.log('Token length:', token?.length);
+    
     const start = Math.floor(Math.random() * 100000000) + 1;
-    console.log('Attempting API call with start ID:', start);
-    console.log('Token exists:', !!import.meta.env.VITE_GITHUB_TOKEN);
-
+    
+    const headers = {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github.v3+json'
+    };
+    
+    console.log('Headers:', headers);
+    
     const response = await fetch(
       `https://api.github.com/users?since=${start}&per_page=10`,
-      {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
-        },
-      }
+      { headers }
     );
 
     console.log('Response status:', response.status);
@@ -35,22 +40,19 @@ const searchGithub = async () => {
 
 const searchGithubUser = async (username: string) => {
   try {
-    console.log('Fetching details for user:', username);
-    
+    const token = import.meta.env.VITE_GITHUB_TOKEN;
     const response = await fetch(
       `https://api.github.com/users/${username}`,
       {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
+          'Authorization': `token ${token}`,
           'Accept': 'application/vnd.github.v3+json'
         },
       }
     );
 
-    console.log('User details response status:', response.status);
     const data = await response.json();
-    console.log('User details data:', data);
-
+    
     if (!response.ok) {
       throw new Error(`GitHub API error: ${data.message || 'unknown error'}`);
     }
